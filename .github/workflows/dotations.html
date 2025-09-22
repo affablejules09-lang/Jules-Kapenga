@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calendrier Cycle Fertile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(to bottom, #f0f8ff, #d0e6f7);
+    margin: 0;
+}
+
+/* Page d'accueil */
+#pageAccueil { display: block; }
+#titreAccueil {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    background: linear-gradient(to right, #6dd5fa, #2980b9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+#description { font-size: 18px; margin: 15px auto; max-width: 700px; line-height: 1.7; color: #2c3e50; }
+#description ul, #description ol { text-align: left; max-width: 550px; margin: 10px auto 20px; font-size: 16px; line-height: 1.6; }
+#startButton {
+    margin-top: 20px;
+    font-size: 20px;
+    padding: 12px 30px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(to right, #6dd5fa, #2980b9);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+#startButton:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+#signatureAccueil {
+    margin-top: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    font-style: italic;
+    background: linear-gradient(to right, #6dd5fa, #2980b9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Calendrier */
+#calendrierContainer { display: none; text-align: center; border: 2px solid #ccc; border-radius: 12px; padding: 20px; background-color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 700px; margin: 20px auto; }
+#cycleContainer { display: grid; grid-template-columns: repeat(auto-fit,minmax(50px,1fr)); gap: 6px; justify-items: center; margin-top: 20px; }
+.jour { width: 50px; height: 50px; line-height: 50px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 14px; transition: transform 0.2s; text-align: center; color: white; }
+.jour:hover { transform: scale(1.1); }
+.legende { display:flex; justify-content:center; gap:15px; font-size:12px; margin-bottom:10px; flex-wrap:wrap; }
+.legende-item { display:flex; align-items:center; gap:4px; }
+#nextPeriod { margin-top:15px; font-size:18px; font-weight:bold; color:#c0392b; background:#fde2e2; border:2px solid #e74c3c; border-radius:10px; padding:10px 15px; display:inline-block; opacity:0; transition:opacity 0.8s ease-in-out; }
+#conseilJour { margin-top:15px; font-size:16px; font-weight:bold; padding:10px 15px; border-radius:10px; display:none; min-width:280px; max-width:300px; text-align:left; font-style:italic; }
+#signature { margin-top:25px; font-size:24px; font-weight:bold; font-style:italic; background:linear-gradient(to right, #6dd5fa, #2980b9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:1px 1px 2px rgba(0,0,0,0.4); animation:fadeIn 2s ease-in-out; }
+@keyframes fadeIn { 0% { opacity:0; transform:translateY(10px);} 100% { opacity:1; transform:translateY(0);} }
+.input-container { margin-bottom:15px; }
+.input-container input { padding:5px; font-size:14px; border-radius:5px; border:1px solid #ccc; margin-right:5px; }
+.input-container button { padding:5px 10px; font-size:16px; border-radius:6px; border:none; background:#2980b9; color:white; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- Page d'accueil -->
+<div id="pageAccueil">
+<h1 id="titreAccueil">Bienvenue dans le Calendrier Cycle Fertile</h1>
+
+<div id="description">
+<p>Ce logiciel vous aide à suivre votre cycle menstruel et à détecter :</p>
+<ul>
+    <li>Les jours à très faible risque de grossesse 🟢</li>
+    <li>Les jours fertiles et à risque élevé 🔴</li>
+    <li>Les jours à risque faible 🟠</li>
+    <li>Les conseils personnalisés selon chaque jour</li>
+    <li>La date probable de vos prochaines règles 🩸</li>
+</ul>
+
+<p>Pour utiliser le calendrier :</p>
+<ol>
+    <li>Saisissez la durée de votre cycle (en jours) et la date de vos dernières règles.</li>
+    <li>Cliquez sur le bouton "Afficher le calendrier".</li>
+    <li>Cliquez sur un jour pour voir les conseils et le niveau de risque.</li>
+</ol>
+</div>
+
+<button id="startButton" onclick="startApp()">📅 Commencer</button>
+<div id="signatureAccueil">Ir Jules Affable ✊</div>
+</div>
+
+<!-- Calendrier -->
+<div id="calendrierContainer">
+  <div class="legende">
+    <div class="legende-item"><span style="color:#7CFC00;">🟢</span>Très faible</div>
+    <div class="legende-item"><span style="color:#FF4C4C;">🔴</span>Fertile</div>
+    <div class="legende-item"><span style="color:#FFA500;">🟠</span>Risque faible</div>
+  </div>
+
+  <div class="input-container">
+    <label>Cycle (jours) :</label>
+    <input type="number" id="cycleInput" value="26" min="20" max="40">
+    <label>Dernières règles :</label>
+    <input type="date" id="startDate">
+    <button onclick="toggleCalendrier()">📅</button>
+  </div>
+
+  <div id="cycleContainer"></div>
+  <div id="nextPeriod"></div>
+  <div id="conseilJour"></div>
+  <div id="signature">Ir Jules Affable ✊</div>
+</div>
+
+<script>
+function startApp() {
+    document.getElementById('pageAccueil').style.display = 'none';
+    document.getElementById('calendrierContainer').style.display = 'block';
+}
+
+function toggleCalendrier() {
+    const container = document.getElementById("cycleContainer");
+    const conseilDiv = document.getElementById("conseilJour");
+    const nextPeriod = document.getElementById("nextPeriod");
+    const cycle = parseInt(document.getElementById("cycleInput").value);
+    const startDate = document.getElementById("startDate").value;
+
+    if (!startDate) { alert("Veuillez entrer la date des dernières règles !"); return; }
+
+    if (container.innerHTML !== "") {
+        container.innerHTML = "";
+        conseilDiv.style.display = "none";
+        nextPeriod.innerHTML = "";
+        nextPeriod.style.opacity = 0;
+        return;
+    }
+
+    container.innerHTML = "";
+    conseilDiv.innerHTML = "";
+    conseilDiv.style.display = "none";
+
+    const ovulation = Math.round(cycle * 0.48);
+    const debutFertile = Math.max(1, ovulation - 5);
+    let currentDate = new Date(startDate);
+
+    for (let jour = 1; jour <= cycle; jour++) {
+        const divJour = document.createElement("div");
+        divJour.classList.add("jour");
+        divJour.innerText = currentDate.getDate();
+
+        let couleur = "", message = "", prefix = "<span style='color:black'>Conseil :</span>";
+
+        if(jour <= 6) {
+            couleur="#7CFC00";
+            message="Risque très faible. À ton choix, de te protéger ou pas.";
+        } else if(jour >= debutFertile && jour <= ovulation) {
+            couleur="#FF4C4C";
+            message="Attention ! Risque élevé de grossesse. Protégez-vous absolument !";
+            prefix="<span style='color:blue'>Conseil :</span>";
+        } else {
+            couleur="#FFA500";
+            message="Risque faible mais présent. Protégez-vous pour plus de sécurité.";
+        }
+
+        divJour.style.backgroundColor = couleur;
+        divJour.onclick = () => {
+            conseilDiv.style.display = "inline-block";
+            conseilDiv.style.backgroundColor = couleur;
+            conseilDiv.style.color = "#fff";
+            conseilDiv.innerHTML = `${prefix} ${message}`;
+        };
+
+        container.appendChild(divJour);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    const nextDate = new Date(startDate);
+    nextDate.setDate(nextDate.getDate() + cycle);
+    nextPeriod.innerText = "🩸 Prochaine règle prévue : " + nextDate.toLocaleDateString();
+    setTimeout(()=>{ nextPeriod.style.opacity = 1; }, 100);
+}
+</script>
+
+</body>
+</html>
